@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  be-tct:
+    container_name: be-tct
+    restart: always
+    build:
+      context: .
+      target: production
+    depends_on:
+      - postgres
+    ports:
+      - 1337:1337
+    environment:
+      HOST: ${HOST-0.0.0.0}
+      PORT: ${PORT-1337}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: ${DATABASE_SSL}
+    networks:
+      - network
+
+  postgres:
+    container_name: tct-postgres
+    image: postgres:14.0-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME-admin}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD-admin}
+      POSTGRES_DB: ${DATABASE_NAME-be-tct}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - network
+
+volumes:
+  postgres:
+    name: postgres
+
+networks:
+  network:
